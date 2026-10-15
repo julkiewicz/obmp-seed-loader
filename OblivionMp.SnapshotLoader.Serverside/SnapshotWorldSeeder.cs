@@ -28,7 +28,7 @@ public sealed partial class SnapshotWorldSeeder(WorldSnapshot snapshot, IEntitie
     {
         if (snapshot.ItemValues.Count == 0)
         {
-            logger.LogWarning("The world snapshot has no item values, trade prices are checked against the client's values");
+            logger.LogWarning("The seed has no item values, trade prices are checked against the client's values");
             return;
         }
 
@@ -53,7 +53,7 @@ public sealed partial class SnapshotWorldSeeder(WorldSnapshot snapshot, IEntitie
             {
                 if (item.Kind is not { } kind)
                 {
-                    logger.LogError("Npc template {BaseId:X8}: item {ItemId:X8} has no kind in the snapshot, it is left out", record.Id, item.ItemId);
+                    logger.LogError("Npc template {BaseId:X8}: item {ItemId:X8} has no kind in the seed, it is left out", record.Id, item.ItemId);
                     continue;
                 }
 

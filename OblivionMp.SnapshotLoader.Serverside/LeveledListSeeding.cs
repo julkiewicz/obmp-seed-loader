@@ -23,7 +23,7 @@ internal static class LeveledListSeeding
 
         if (!snapshot.TryGetLeveledItemList(listId, out var record))
         {
-            logger.LogError("Leveled item list {ListId:X8} is not in the snapshot, containers rolling it get nothing from it", listId);
+            logger.LogError("Leveled item list {ListId:X8} is not in the seed, containers rolling it get nothing from it", listId);
             return;
         }
 
@@ -36,7 +36,7 @@ internal static class LeveledListSeeding
         {
             if (entry.Kind is not { } kind)
             {
-                logger.LogError("Leveled item list {ListId:X8}: entry {ItemId:X8} has no kind in the snapshot, it is left out", listId, entry.ItemId);
+                logger.LogError("Leveled item list {ListId:X8}: entry {ItemId:X8} has no kind in the seed, it is left out", listId, entry.ItemId);
                 continue;
             }
 

@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <RootNamespace>OblivionMp.SnapshotLoader.Serverside</RootNamespace>
+        <!-- The fetched seed: data the mod folder carries, not the build. -->
+        <DefaultItemExcludes>$(DefaultItemExcludes);seed/**</DefaultItemExcludes>
     </PropertyGroup>
 
     <ItemGroup>

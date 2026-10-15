@@ -84,7 +84,7 @@ public sealed partial class SnapshotCellSeeder(WorldSnapshot snapshot, IEntities
         {
             if (item.Kind is not { } kind)
             {
-                logger.LogError("Container {RefId:X} in {Cell}: base item {ItemId:X8} has no kind in the snapshot, it is left out", reference.RefId, cell.FullCellId, item.ItemId);
+                logger.LogError("Container {RefId:X} in {Cell}: base item {ItemId:X8} has no kind in the seed, it is left out", reference.RefId, cell.FullCellId, item.ItemId);
                 continue;
             }
 

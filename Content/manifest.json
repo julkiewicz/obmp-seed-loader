@@ -1,9 +1,9 @@
 {
-  "uniqueId": "SnapshotLoader",
+  "uniqueId": "OblivionMp.SeedLoader",
   "version": "1.0.0",
-  "name": "OblivionMP world snapshot loader",
+  "name": "OblivionMP seed loader",
   "author": "ReadyM Team",
-  "description": "Seeds each new cell with its placed content, and a new world with item values and npc templates, from the world snapshot.",
+  "description": "Seeds each new cell with its placed content, and a new world with item values and npc templates, from the seed.",
   "dependencies": [
     {
         "uniqueId": "OblivionMP.SDK",

@@ -141,6 +141,20 @@ if ($clientProject)
 }
 Copy-BuildArtifacts -Files $serverFiles -BaseDir $serverBuildDir -DestRoot $serverRoot
 Copy-BuildArtifacts -Files $serverContentFiles -BaseDir $contentDir -DestRoot $serverRoot
+
+if ($serverDataFolder)
+{
+    $data = Join-Path $scriptDir $serverDataFolder
+    if (Test-Path $data -PathType Container)
+    {
+        Copy-Item $data (Join-Path $serverRoot 'content') -Recurse -Force
+        Write-Host "Copied $serverDataFolder to server/content."
+    }
+    else
+    {
+        Write-Warning "No $serverDataFolder, so the mod folder has no server/content. Fetch the seed first (see README.md)."
+    }
+}
 Copy-BuildArtifacts -Files $manifestFiles -BaseDir $contentDir -DestRoot $modRoot
 
 # Open explorer to the output directory

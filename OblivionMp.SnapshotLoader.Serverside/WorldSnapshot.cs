@@ -10,32 +10,32 @@ public sealed class WorldSnapshot
 {
     public const int SchemaVersion = 5;
 
-    private const string ContentFolder = "content";
     private const string WorldFolder = "world";
     private const string IndexFileName = "index.json";
     private const string LeveledItemsFileName = "leveled-items.json";
     private const string ItemValuesFileName = "item-values.json";
     private const string NpcTemplatesFileName = "npc-templates.json";
 
-    private readonly string _folder = Path.Combine(AppContext.BaseDirectory, ContentFolder, WorldFolder);
+    private readonly string _folder;
     private readonly Dictionary<FullCellId, string> _fileByCell = [];
     private readonly Dictionary<uint, LeveledItemRecord> _leveledItemListById = [];
     private readonly List<ItemValueRecord> _itemValues = [];
     private readonly List<NpcTemplateRecord> _npcTemplates = [];
 
-    public WorldSnapshot(ILogger logger)
+    public WorldSnapshot(ILogger logger, SeedSettings settings)
     {
+        _folder = Path.Combine(settings.ContentFolder, WorldFolder);
         var indexPath = Path.Combine(_folder, IndexFileName);
         if (!File.Exists(indexPath))
         {
-            logger.LogWarning("No world snapshot at {Path}, cells are not seeded", indexPath);
+            logger.LogWarning("No seed at {Path}, cells are not seeded", indexPath);
             return;
         }
 
         var index = Read(indexPath, WorldSnapshotJsonContext.Default.SnapshotIndex);
         if (index.SchemaVersion != SchemaVersion)
         {
-            logger.LogWarning("World snapshot at {Path} has schema {Found}, expected {Expected}, cells are not seeded", indexPath, index.SchemaVersion, SchemaVersion);
+            logger.LogWarning("Seed at {Path} has schema {Found}, expected {Expected}, cells are not seeded", indexPath, index.SchemaVersion, SchemaVersion);
             return;
         }
 
@@ -55,7 +55,7 @@ public sealed class WorldSnapshot
         _itemValues.AddRange(Read(Path.Combine(_folder, ItemValuesFileName), WorldSnapshotJsonContext.Default.ItemValuesFileRecord).Items);
         _npcTemplates.AddRange(Read(Path.Combine(_folder, NpcTemplatesFileName), WorldSnapshotJsonContext.Default.NpcTemplatesFileRecord).Npcs);
 
-        logger.LogInformation("World snapshot with {Areas} areas, {Cells} cells, {Lists} leveled item lists, {Values} item values and {Npcs} npc templates, load order {LoadOrder}", index.Areas.Count, _fileByCell.Count, _leveledItemListById.Count, _itemValues.Count, _npcTemplates.Count, string.Join(", ", index.LoadOrder));
+        logger.LogInformation("Seed with {Areas} areas, {Cells} cells, {Lists} leveled item lists, {Values} item values and {Npcs} npc templates, load order {LoadOrder}", index.Areas.Count, _fileByCell.Count, _leveledItemListById.Count, _itemValues.Count, _npcTemplates.Count, string.Join(", ", index.LoadOrder));
     }
 
     public IReadOnlyList<ItemValueRecord> ItemValues => _itemValues;

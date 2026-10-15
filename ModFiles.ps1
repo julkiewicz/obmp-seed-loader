@@ -8,7 +8,7 @@
 # This is a server-only mod: it has no client half, so players never download anything for it.
 
 # Folder name of the packaged mod.
-$modName = "OblivionMp.SnapshotLoader"
+$modName = "OblivionMp.SeedLoader"
 
 # The projects the halves build from. No client project: the folder gets no client/.
 $clientProject = ""
@@ -28,6 +28,10 @@ $manifestFiles = @(
 $clientContentFiles = @()
 
 $serverContentFiles = @()
+
+# Copied whole into server/content/, where the mod reads it, when it is there: the seed, which is fetched rather than
+# built, so a folder made without it only warns.
+$serverDataFolder = "OblivionMp.SnapshotLoader.Serverside/seed"
 
 # Added only in Debug builds.
 $clientBuildFiles = @()

@@ -56,6 +56,9 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
+# The fetched seed. Hosted in blob storage, not in git.
+/OblivionMp.SnapshotLoader.Serverside/seed/
+
 # Template build artifacts
 build.log
 Output/
