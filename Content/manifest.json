@@ -1,0 +1,13 @@
+{
+  "uniqueId": "SnapshotLoader",
+  "version": "1.0.0",
+  "name": "OblivionMP world snapshot loader",
+  "author": "ReadyM Team",
+  "description": "Seeds each new cell with its placed content, and a new world with item values and npc templates, from the world snapshot.",
+  "dependencies": [
+    {
+        "uniqueId": "OblivionMP.SDK",
+        "minimumVersion": "1.0.0"
+    }
+  ]
+}

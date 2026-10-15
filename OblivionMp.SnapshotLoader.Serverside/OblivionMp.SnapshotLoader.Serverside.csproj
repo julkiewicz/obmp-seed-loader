@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>OblivionMp.SnapshotLoader.Serverside</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ReadyM.SDK.Oblivion.Server" Version="$(OblivionSdkVersion)" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" PrivateAssets="all" />
+    </ItemGroup>
+
+</Project>
