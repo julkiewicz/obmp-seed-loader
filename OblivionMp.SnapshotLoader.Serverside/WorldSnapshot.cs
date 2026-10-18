@@ -8,7 +8,7 @@ namespace OblivionMp.SnapshotLoader.Serverside;
 
 public sealed class WorldSnapshot
 {
-    public const int SchemaVersion = 5;
+    public const int SchemaVersion = 6;
 
     private const string WorldFolder = "world";
     private const string IndexFileName = "index.json";
