@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
 
         <!-- The OblivionMP SDK packages every project builds against -->
-        <OblivionSdkVersion>1.0.0-rc.1</OblivionSdkVersion>
+        <OblivionSdkVersion>1.0.0-rc.3</OblivionSdkVersion>
     </PropertyGroup>
 
 </Project>
