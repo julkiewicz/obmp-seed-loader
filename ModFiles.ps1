@@ -29,9 +29,9 @@ $clientContentFiles = @()
 
 $serverContentFiles = @()
 
-# Copied whole into server/content/, where the mod reads it, when it is there: the seed, which is fetched rather than
+# Copied into server/content/, where the mod reads it, when it is there: the seed, one zip that is fetched rather than
 # built, so a folder made without it only warns.
-$serverDataFolder = "OblivionMp.SnapshotLoader.Serverside/seed"
+$serverDataFile = "OblivionMp.SnapshotLoader.Serverside/seed/seed.zip"
 
 # Added only in Debug builds.
 $clientBuildFiles = @()
