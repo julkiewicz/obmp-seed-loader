@@ -142,17 +142,19 @@ if ($clientProject)
 Copy-BuildArtifacts -Files $serverFiles -BaseDir $serverBuildDir -DestRoot $serverRoot
 Copy-BuildArtifacts -Files $serverContentFiles -BaseDir $contentDir -DestRoot $serverRoot
 
-if ($serverDataFolder)
+if ($serverDataFile)
 {
-    $data = Join-Path $scriptDir $serverDataFolder
-    if (Test-Path $data -PathType Container)
+    $data = Join-Path $scriptDir $serverDataFile
+    if (Test-Path $data -PathType Leaf)
     {
-        Copy-Item $data (Join-Path $serverRoot 'content') -Recurse -Force
-        Write-Host "Copied $serverDataFolder to server/content."
+        $contentRoot = Join-Path $serverRoot 'content'
+        New-Item -ItemType Directory -Path $contentRoot -Force | Out-Null
+        Copy-Item $data $contentRoot -Force
+        Write-Host "Copied $serverDataFile to server/content."
     }
     else
     {
-        Write-Warning "No $serverDataFolder, so the mod folder has no server/content. Fetch the seed first (see README.md)."
+        Write-Warning "No $serverDataFile, so the mod folder has no seed. Fetch the seed first (see README.md)."
     }
 }
 Copy-BuildArtifacts -Files $manifestFiles -BaseDir $contentDir -DestRoot $modRoot

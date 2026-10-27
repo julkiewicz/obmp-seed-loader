@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.Extensions.Logging;
@@ -8,15 +9,17 @@ namespace OblivionMp.SnapshotLoader.Serverside;
 
 public sealed class WorldSnapshot
 {
-    public const int SchemaVersion = 5;
+    private const int SchemaVersion = 5;
 
+    private const string SeedFileName = "seed.zip";
     private const string WorldFolder = "world";
     private const string IndexFileName = "index.json";
     private const string LeveledItemsFileName = "leveled-items.json";
     private const string ItemValuesFileName = "item-values.json";
     private const string NpcTemplatesFileName = "npc-templates.json";
 
-    private readonly string _folder;
+    // Not thread-safe, which is fine: the seeders run on the game thread.
+    private readonly ZipArchive? _seed;
     private readonly Dictionary<FullCellId, string> _fileByCell = [];
     private readonly Dictionary<uint, LeveledItemRecord> _leveledItemListById = [];
     private readonly List<ItemValueRecord> _itemValues = [];
@@ -24,18 +27,25 @@ public sealed class WorldSnapshot
 
     public WorldSnapshot(ILogger logger, SeedSettings settings)
     {
-        _folder = Path.Combine(settings.ContentFolder, WorldFolder);
-        var indexPath = Path.Combine(_folder, IndexFileName);
-        if (!File.Exists(indexPath))
+        var seedPath = Path.Combine(settings.ContentFolder, SeedFileName);
+        if (!File.Exists(seedPath))
         {
-            logger.LogWarning("No seed at {Path}, cells are not seeded", indexPath);
+            logger.LogWarning("No seed at {Path}, cells are not seeded", seedPath);
             return;
         }
 
-        var index = Read(indexPath, WorldSnapshotJsonContext.Default.SnapshotIndex);
+        // Keep in RAM so we don't lock the file
+        _seed = new ZipArchive(new MemoryStream(File.ReadAllBytes(seedPath)), ZipArchiveMode.Read);
+        if (_seed.GetEntry(EntryName(IndexFileName)) is null)
+        {
+            logger.LogWarning("Seed at {Path} has no {Entry}, cells are not seeded", seedPath, EntryName(IndexFileName));
+            return;
+        }
+
+        var index = Read(IndexFileName, WorldSnapshotJsonContext.Default.SnapshotIndex);
         if (index.SchemaVersion != SchemaVersion)
         {
-            logger.LogWarning("Seed at {Path} has schema {Found}, expected {Expected}, cells are not seeded", indexPath, index.SchemaVersion, SchemaVersion);
+            logger.LogWarning("Seed at {Path} has schema {Found}, expected {Expected}, cells are not seeded", seedPath, index.SchemaVersion, SchemaVersion);
             return;
         }
 
@@ -49,11 +59,11 @@ public sealed class WorldSnapshot
             }
         }
 
-        foreach (var list in Read(Path.Combine(_folder, LeveledItemsFileName), WorldSnapshotJsonContext.Default.LeveledItemsFileRecord).Lists)
+        foreach (var list in Read(LeveledItemsFileName, WorldSnapshotJsonContext.Default.LeveledItemsFileRecord).Lists)
             _leveledItemListById.Add(list.Id, list);
 
-        _itemValues.AddRange(Read(Path.Combine(_folder, ItemValuesFileName), WorldSnapshotJsonContext.Default.ItemValuesFileRecord).Items);
-        _npcTemplates.AddRange(Read(Path.Combine(_folder, NpcTemplatesFileName), WorldSnapshotJsonContext.Default.NpcTemplatesFileRecord).Npcs);
+        _itemValues.AddRange(Read(ItemValuesFileName, WorldSnapshotJsonContext.Default.ItemValuesFileRecord).Items);
+        _npcTemplates.AddRange(Read(NpcTemplatesFileName, WorldSnapshotJsonContext.Default.NpcTemplatesFileRecord).Npcs);
 
         logger.LogInformation("Seed with {Areas} areas, {Cells} cells, {Lists} leveled item lists, {Values} item values and {Npcs} npc templates, load order {LoadOrder}", index.Areas.Count, _fileByCell.Count, _leveledItemListById.Count, _itemValues.Count, _npcTemplates.Count, string.Join(", ", index.LoadOrder));
     }
@@ -72,13 +82,17 @@ public sealed class WorldSnapshot
             return false;
         }
 
-        cell = Read(Path.Combine(_folder, file), WorldSnapshotJsonContext.Default.CellFileRecord);
+        cell = Read(file, WorldSnapshotJsonContext.Default.CellFileRecord);
         return true;
     }
 
-    private static T Read<T>(string path, JsonTypeInfo<T> typeInfo) where T : struct
+    // Seed files are under world/ in the zip, and the index names cell files relative to it
+    private static string EntryName(string file) => $"{WorldFolder}/{file}";
+
+    private T Read<T>(string file, JsonTypeInfo<T> typeInfo) where T : struct
     {
-        using var stream = File.OpenRead(path);
+        var entry = _seed!.GetEntry(EntryName(file)) ?? throw new InvalidDataException($"The seed has no {EntryName(file)}");
+        using var stream = entry.Open();
         return JsonSerializer.Deserialize(stream, typeInfo);
     }
 }
